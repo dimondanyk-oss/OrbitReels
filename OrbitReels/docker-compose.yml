@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: orbit
+      POSTGRES_PASSWORD: orbit_secret
+      POSTGRES_DB: orbitreels
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+
+  backend:
+    build: ./backend
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgres://orbit:orbit_secret@postgres:5432/orbitreels
+      REDIS_URL: redis://redis:6379
+      BOT_TOKEN: ${BOT_TOKEN}
+      ADMIN_TELEGRAM_IDS: ${ADMIN_TELEGRAM_IDS}
+      CRYPTOBOT_API_TOKEN: ${CRYPTOBOT_API_TOKEN}
+      CRYPTOBOT_WEBHOOK_SECRET: ${CRYPTOBOT_WEBHOOK_SECRET}
+      INFO_CHANNEL_USERNAME: ${INFO_CHANNEL_USERNAME}
+      TURNSTILE_SECRET: ${TURNSTILE_SECRET}
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build: ./frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  pgdata:
