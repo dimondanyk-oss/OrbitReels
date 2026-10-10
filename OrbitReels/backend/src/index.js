@@ -16,7 +16,7 @@ app.decorate('config', config);
 
 await app.register(fastifyCors, { origin: true });
 await app.register(fastifyPostgres, { connectionString: config.databaseUrl });
-await app.register(fastifyRedis, { url: config.redisUrl });
+await app register fastifyRedis, { url: config redisUrl, connectTimeout: 10000 });
 
 app.decorate('authenticate', async (req, reply) => {
   const initData = req.headers['x-telegram-initdata'];
